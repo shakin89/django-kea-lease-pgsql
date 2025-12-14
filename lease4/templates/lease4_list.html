@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lease Data</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Auto-refresh every 30 seconds -->
+    <meta http-equiv="refresh" content="30">
+</head>
+<body>
+    <div class="container">
+        <div class="row mb-3 mt-3">
+            <div class="col-md-6">
+                <h1>Lease Information</h1>
+            </div>
+            <div class="col-md-6 text-right">
+                <div class="mt-2">
+                    <span class="mr-3">Logged in as: <strong>{{ user.username }}</strong></span>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th><a href="?sort=hostname{% if sort_by == 'hostname' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Hostname</a></th>
+                    <th><a href="?sort=ipv4addr{% if sort_by == 'ipv4addr' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">IPv4 Address</a></th>
+                    <th><a href="?sort=hwaddr_formatted{% if sort_by == 'hwaddr_formatted' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">HW Address</a></th>
+                    <th><a href="?sort=subnet_id{% if sort_by == 'subnet_id' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Subnet ID</a></th>
+                    <th><a href="?sort=expire{% if sort_by == 'expire' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Expire</a></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lease in leases %}
+                <tr>
+                    <td>{{ lease.hostname|default_if_none:"" }}</td>
+                    <td>{{ lease.ipv4addr }}</td>
+                    <td>{{ lease.hwaddr_formatted|default_if_none:"" }}</td>
+                    <td>{{ lease.subnet_id|default_if_none:"" }}</td>
+                    <td>{{ lease.expire|date:"DATETIME_FORMAT"|default_if_none:"" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'lease4_delete_url' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="address" value="{{ lease.address }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No lease data available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
