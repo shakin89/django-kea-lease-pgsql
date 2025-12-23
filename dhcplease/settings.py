@@ -28,7 +28,7 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOST', 'localhost').split('|')
 
-CSRF_TRUSTED_ORIGINS = ['https://dj.shak.win']
+CSRF_TRUSTED_ORIGINS = ['https://leases.shak.win','http://dockge.mgmt.shak.win']
 
 # Application definition
 
