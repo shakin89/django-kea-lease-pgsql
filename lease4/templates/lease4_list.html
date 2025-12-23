@@ -4,32 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lease Data</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Auto-refresh every 30 seconds -->
     <meta http-equiv="refresh" content="30">
+    <style>
+        .col-optional { display: none; }
+        .col-optional.show { display: table-cell; }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row mb-3 mt-3">
             <div class="col-md-6">
                 <h1>Lease Information</h1>
             </div>
             <div class="col-md-6 text-right">
                 <div class="mt-2">
+                    <button type="button" class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#configModal">
+                        Configura Tabella
+                    </button>
                     <span class="mr-3">Logged in as: <strong>{{ user.username }}</strong></span>
                     <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm">Logout</a>
                 </div>
             </div>
         </div>
-        <table class="table table-striped table-bordered table-hover">
+        <table class="table table-striped table-bordered table-hover table-sm">
             <thead class="thead-dark">
                 <tr>
                     <th><a href="?sort=hostname{% if sort_by == 'hostname' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Hostname</a></th>
-                    <th><a href="?sort=ipv4addr{% if sort_by == 'ipv4addr' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">IPv4 Address</a></th>
-                    <th><a href="?sort=hwaddr_formatted{% if sort_by == 'hwaddr_formatted' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">HW Address</a></th>
-                    <th><a href="?sort=subnet_id{% if sort_by == 'subnet_id' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Subnet ID</a></th>
-                    <th><a href="?sort=expire{% if sort_by == 'expire' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Expire</a></th>
+                    <th><a href="?sort=hwaddr{% if sort_by == 'hwaddr' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">HW Address</a></th>
+                    <th><a href="?sort=ipv4{% if sort_by == 'ipv4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">IPv4</a></th>
+                    <th><a href="?sort=ipv6{% if sort_by == 'ipv6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">IPv6</a></th>
+                    <th class="col-optional col-clientidv4"><a href="?sort=clientidv4{% if sort_by == 'clientidv4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Client ID v4</a></th>
+                    <th class="col-optional col-clientidv6"><a href="?sort=clientidv6{% if sort_by == 'clientidv6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Client ID v6</a></th>
+                    <th class="col-optional col-subnet_id_v4"><a href="?sort=subnet_id_v4{% if sort_by == 'subnet_id_v4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Subnet v4</a></th>
+                    <th class="col-optional col-subnet_id_v6"><a href="?sort=subnet_id_v6{% if sort_by == 'subnet_id_v6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Subnet v6</a></th>
+                    <th class="col-optional col-expire_v4"><a href="?sort=expire_v4{% if sort_by == 'expire_v4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Expire v4</a></th>
+                    <th class="col-optional col-expire_v6"><a href="?sort=expire_v6{% if sort_by == 'expire_v6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Expire v6</a></th>
+                    <th class="col-optional col-valid_lifetime_v4"><a href="?sort=valid_lifetime_v4{% if sort_by == 'valid_lifetime_v4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Valid Lifetime v4</a></th>
+                    <th class="col-optional col-valid_lifetime_v6"><a href="?sort=valid_lifetime_v6{% if sort_by == 'valid_lifetime_v6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">Valid Lifetime v6</a></th>
+                    <th class="col-optional col-state_v4"><a href="?sort=state_v4{% if sort_by == 'state_v4' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">State v4</a></th>
+                    <th class="col-optional col-state_v6"><a href="?sort=state_v6{% if sort_by == 'state_v6' and sort_order == 'asc' %}&order=desc{% else %}&order=asc{% endif %}">State v6</a></th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -37,30 +51,139 @@
                 {% for lease in leases %}
                 <tr>
                     <td>{{ lease.hostname|default_if_none:"" }}</td>
-                    <td>{{ lease.ipv4addr }}</td>
-                    <td>{{ lease.hwaddr_formatted|default_if_none:"" }}</td>
-                    <td>{{ lease.subnet_id|default_if_none:"" }}</td>
-                    <td>{{ lease.expire|date:"DATETIME_FORMAT"|default_if_none:"" }}</td>
+                    <td>{{ lease.hwaddr|default_if_none:"" }}</td>
+                    <td>{{ lease.ipv4|default_if_none:"" }}</td>
+                    <td>{{ lease.ipv6|default_if_none:"" }}</td>
+                    <td class="col-optional col-clientidv4">{{ lease.clientidv4|default_if_none:"" }}</td>
+                    <td class="col-optional col-clientidv6">{{ lease.clientidv6|default_if_none:"" }}</td>
+                    <td class="col-optional col-subnet_id_v4">{{ lease.subnet_id_v4|default_if_none:"" }}</td>
+                    <td class="col-optional col-subnet_id_v6">{{ lease.subnet_id_v6|default_if_none:"" }}</td>
+                    <td class="col-optional col-expire_v4">{{ lease.expire_v4|date:"DATETIME_FORMAT"|default_if_none:"" }}</td>
+                    <td class="col-optional col-expire_v6">{{ lease.expire_v6|date:"DATETIME_FORMAT"|default_if_none:"" }}</td>
+                    <td class="col-optional col-valid_lifetime_v4">{{ lease.valid_lifetime_v4|default_if_none:"" }}</td>
+                    <td class="col-optional col-valid_lifetime_v6">{{ lease.valid_lifetime_v6|default_if_none:"" }}</td>
+                    <td class="col-optional col-state_v4">{{ lease.state_v4|default_if_none:"" }}</td>
+                    <td class="col-optional col-state_v6">{{ lease.state_v6|default_if_none:"" }}</td>
                     <td>
-                        <form method="post" action="{% url 'lease4_delete_url' %}">
+                        <form method="post" action="{% url 'lease4_delete_url' %}" style="display:inline;">
                             {% csrf_token %}
-                            <input type="hidden" name="address" value="{{ lease.address }}">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            {% if lease.address_raw_v4 %}
+                                <input type="hidden" name="address_v4" value="{{ lease.address_raw_v4 }}">
+                            {% endif %}
+                            {% if lease.address_raw_v6 %}
+                                <input type="hidden" name="address_v6" value="{{ lease.address_raw_v6 }}">
+                            {% endif %}
+                            <button type="submit" class="btn btn-danger btn-sm" {% if not lease.address_raw_v4 and not lease.address_raw_v6 %}disabled{% endif %}>Delete</button>
                         </form>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">No lease data available.</td>
+                    <td colspan="15" class="text-center">No lease data available.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- Bootstrap JS (optional) -->
+    <!-- Modal Configurazione -->
+    <div class="modal fade" id="configModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Configura Colonne Tabella</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_clientidv4">
+                        <label class="form-check-label" for="col_clientidv4">Client ID v4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_clientidv6">
+                        <label class="form-check-label" for="col_clientidv6">Client ID v6</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_subnet_id_v4">
+                        <label class="form-check-label" for="col_subnet_id_v4">Subnet v4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_subnet_id_v6">
+                        <label class="form-check-label" for="col_subnet_id_v6">Subnet v6</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_expire_v4">
+                        <label class="form-check-label" for="col_expire_v4">Expire v4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_expire_v6">
+                        <label class="form-check-label" for="col_expire_v6">Expire v6</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_valid_lifetime_v4">
+                        <label class="form-check-label" for="col_valid_lifetime_v4">Valid Lifetime v4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_valid_lifetime_v6">
+                        <label class="form-check-label" for="col_valid_lifetime_v6">Valid Lifetime v6</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_state_v4">
+                        <label class="form-check-label" for="col_state_v4">State v4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="col_state_v6">
+                        <label class="form-check-label" for="col_state_v6">State v6</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    <button type="button" class="btn btn-primary" onclick="saveConfig()">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const columns = [
+            'clientidv4', 'clientidv6', 'subnet_id_v4', 'subnet_id_v6',
+            'expire_v4', 'expire_v6', 'valid_lifetime_v4', 'valid_lifetime_v6',
+            'state_v4', 'state_v6'
+        ];
+
+        function loadConfig() {
+            columns.forEach(col => {
+                const isVisible = localStorage.getItem('col_' + col) === 'true';
+                document.getElementById('col_' + col).checked = isVisible;
+                if (isVisible) {
+                    document.querySelectorAll('.col-' + col).forEach(el => {
+                        el.classList.add('show');
+                    });
+                }
+            });
+        }
+
+        function saveConfig() {
+            columns.forEach(col => {
+                const checkbox = document.getElementById('col_' + col);
+                localStorage.setItem('col_' + col, checkbox.checked);
+                document.querySelectorAll('.col-' + col).forEach(el => {
+                    if (checkbox.checked) {
+                        el.classList.add('show');
+                    } else {
+                        el.classList.remove('show');
+                    }
+                });
+            });
+            $('#configModal').modal('hide');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
 </body>
 </html>
